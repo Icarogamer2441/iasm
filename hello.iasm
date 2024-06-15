@@ -1,0 +1,12 @@
+label print
+    mode cem 1
+    mode cim 2
+    mov map stk
+    outcall
+    mode cem 1
+    mode cim 3
+    outcall
+endlabel
+
+push_str Hello world!
+lbl print
