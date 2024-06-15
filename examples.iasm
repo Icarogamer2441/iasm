@@ -1,0 +1,117 @@
+;; with cem mode 1 you can use cim modes: 1, 2, 3, 4 and 5
+label print
+    mode cem 1
+    mode cim 2
+    mov map stk
+    outcall
+endlabel
+
+label print2
+    mode cem 1
+    mode cim 5
+    outcall
+endlabel
+
+;; you can use cem mode 2 and 3 too!
+;; cem mode 2 (input):
+;; if cim mode is 1: with no question to target memory point (inptgt memname)
+;; if cim mode is 2: with question to target memory point (inptgt memname)
+;; cem mode 3 (exit):
+;; you can use every number on cim to system exit!
+label input
+    mode cem 2
+    mode cim 1
+    outcall
+endlabel
+
+push_str Hello world!
+lbl print
+mode cem 1
+mode cim 3
+outcall
+
+push_str What's your name?
+lbl print
+
+mode cem 1
+mode cim 4
+outcall
+;; inptgt = input target: target memory point
+inptgt mbp
+
+lbl input
+
+lbl print2
+
+mode cem 1
+mode cim 3
+outcall
+
+;; operators: 'div', 'sum', 'mul', 'sub'
+;; 15 + 10
+push 15
+push 10
+sum
+lbl print
+mode cem 1
+mode cim 3
+outcall
+;; 15 - 10
+push 15
+push 10
+sub
+lbl print
+mode cem 1
+mode cim 3
+outcall
+;; adding a number into the stack
+push 10
+;; print the stack
+stk
+;; new line
+mode cem 1
+mode cim 3
+outcall
+;; remove the end of the stack
+pop
+;; stack
+stk
+;; new line
+mode cem 1
+mode cim 3
+outcall
+
+push 10
+push 20
+stk
+mode cem 1
+mode cim 3
+outcall
+
+pop
+stk
+mode cem 1
+mode cim 3
+outcall
+
+;; adding int values to a memory point
+mov mcp 10
+
+;; adding a string integer to a memory point
+push_str 100
+mov mcp stk
+;; modifying the value of a memory point to integer
+int mcp
+;; showing the type of a memory point
+push_str the type of memory point "mcp" is:
+lbl print
+;; space
+mode cem 1
+mode cim 4
+outcall
+;; here:
+type mcp
+;; new line
+mode cem 1
+mode cim 3
+outcall
