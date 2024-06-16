@@ -1,13 +1,43 @@
 import sys
+import os
 
 # cim = computer interpret mode. cem = computer exit mode
 modes = {"cim": 0, "cem": 0}
 mems = {"map": "", "mbp": "", "mcp": "", "mdp": "", "mep": "", "mfp": "", "mgp": "", "mhp": "",
-        "mip": "", "mjp": "", "mkp": ""}
+        "mip": "", "mjp": "", "mkp": "", "nl": "\n", "spc": " "}
 stack = []
 labels = {}
 memslen = len(mems)
 
+# made by chatgpt
+def search_iasmimport(current_dir):
+    # Check if we are in the iasmimport directory
+    if os.path.exists(os.path.join(current_dir, 'iasmimport')):
+        return os.path.join(current_dir, 'iasmimport')
+    
+    # Check if we have reached the root of the filesystem
+    if os.path.abspath(current_dir) == os.path.abspath(os.sep):
+        return None
+    
+    # Try the parent directory
+    parent_dir = os.path.dirname(current_dir)
+    return search_iasmimport(parent_dir)
+
+def process_import(libname):
+    # Search for the iasmimport directory
+    iasm_dir = search_iasmimport(os.getcwd())
+    
+    if iasm_dir is None:
+        print('Error: "iasmimport" directory not found.')
+        return
+    
+    # Check if there is a .iasm file in the iasmimport directory
+    for filename in os.listdir(iasm_dir):
+        if filename.endswith('.iasm') and libname == filename:
+            with open(filename, "r") as fi:
+                interpret(fi.read())
+
+# made by me:
 def interpret(code):
     lines = code.split("\n")
     in_label = [False]
@@ -150,6 +180,74 @@ def interpret(code):
                 elif token == "type":
                     memname = tokens[1]
                     print(type(mems[memname]), end="")
+                elif token == "read":
+                    filememname = tokens[1]
+                    with open(mems[filememname], "r") as fi:
+                        stack.append(fi.read())
+                elif token == "write":
+                    filememname = tokens[1]
+                    with open(mems[filememname], "w") as fi:
+                        fi.write(stack[-1])
+                        stack.pop()
+                elif token == "append":
+                    filememname = tokens[1]
+                    with open(mems[filememname], "a") as fi:
+                        fi.write(stack[-1])
+                        stack.pop()
+                elif token == "appendnl":
+                    filememname = tokens[1]
+                    with open(mems[filememname], "a") as fi:
+                        fi.write("\n")
+                elif token == "readimport":
+                    filename = tokens[1]
+                    if filename.endswith(".iasm"):
+                        with open(filename, "r") as fi:
+                            interpret(fi.read())
+                    else:
+                        print("Error: Use .iasm file extension")
+                elif token == "import":
+                    libname = tokens[1]
+                    process_import(libname)
+                elif token == "joinspc":
+                    memname = tokens[1]
+                    mems[memname] = stack[len(stack) - 2] + " " + stack[len(stack) - 1]
+                    stack.pop()
+                    stack.pop()
+                elif token == "join":
+                    memname = tokens[1]
+                    mems[memname] = stack[len(stack) - 2] + stack[len(stack) - 1]
+                    stack.pop()
+                    stack.pop()
+                elif token == "joinnl":
+                    memname = tokens[1]
+                    mems[memname] = stack[len(stack) - 2] + "\n" + stack[len(stack) - 1]
+                    stack.pop()
+                    stack.pop()
+                elif token == "joinspcmem":
+                    memname1 = tokens[1]
+                    memname2 = tokens[2]
+                    mems[memname1] = mems.get(memname1) + " " + mems.get(memname2)
+                elif token == "joinmem":
+                    memname1 = tokens[1]
+                    memname2 = tokens[2]
+                    mems[memname1] = mems.get(memname1) + mems.get(memname2)
+                elif token == "joinmemnl":
+                    memname1 = tokens[1]
+                    memname2 = tokens[2]
+                    mems[memname1] = mems.get(memname1) + "\n" + mems.get(memname2)
+                elif token == "stack":
+                    memname = tokens[1]
+                    stack.append(mems.get(memname))
+                    mems[memname] = ""
+                elif token == "memimport":
+                    memfilename = tokens[1]
+                    if mems.get(memfilename).endswith(".iasm"):
+                        with open(mems.get(memfilename), "r") as fi:
+                            interpret(fi.read())
+                    else:
+                        print("Error: Use .iasm file extension")
+                else:
+                    print(f"Error: unkown token '{token}'.")
             elif in_label[0]:
                 if token == "endlabel":
                     in_label[0] = False
@@ -162,7 +260,7 @@ def interpret(code):
                 sys.exit(1)
     
 if __name__ == "__main__":
-    version = "1.0"
+    version = "1.1"
     if len(sys.argv) == 1:
         print(f"Interpreted assembly. version: {version}")
         print(f"Usage: {sys.argv[0]} <file>")
