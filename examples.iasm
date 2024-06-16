@@ -115,3 +115,66 @@ type mcp
 mode cem 1
 mode cim 3
 outcall
+
+label nl
+    mode cem 1
+    mode cim 3
+    outcall
+endlabel
+
+label print3
+    mode cem 1
+    mode cim 2
+    outcall
+endlabel
+
+push_str push_str Hello world! im in an "load" function
+push_str mov map stk
+;; you can use "joinnl output_mem_name", "joinspc output_mem_name" or "join output_mem_name" ("join" is to join with no space and no new line)
+joinnl mbp
+push_str lbl print
+mov mcp stk
+;; you can use "joinmemnl output/input_mem1 input_mem2", "joinmemspc output/input_mem1 input_mem2" or "joinmem output/input_mem1 input_mem2" ("joinmem" is to join with no space and no new line)
+joinmemnl mbp mcp
+push_str lbl nl
+mov mcp stk
+joinmemnl mbp mcp
+;; remove the value of the memory pos "b" and put the value in the stack
+stack mbp
+;; prints the stack with new line
+stk
+lbl nl
+;; other
+push_str omaga
+mov mcp stk
+push_str omaga
+mov mdp stk
+
+label isequal
+    push_str It's equal!
+    lbl print
+    lbl nl
+endlabel
+
+label isnotequal
+    push_str It's not equal!
+    lbl print
+    lbl nl
+endlabel
+;; if is equal
+cmp mcp mdp isequal
+
+;; other (to work with not compare (ncmp))
+push_str not omaga
+mov mdp stk
+
+;; if is not equal
+ncmp mcp mdp isnotequal
+
+;; you can read an file using "read memory_point_name" (the content output will be in stack)
+;; you can write in a file using "write memory_point_name" (the content input is the end item of the stack)
+;; you can append in a file using "append memory_point_name" (the content input is the end item of the stack)
+;; you can append a new line in a file using "appendnl memory_point_name"
+;; you can import a file using "readimport filename.iasm"
+;; you can import a lib using "import libname.iasm" (you need to have the "iasmimport" folder in somewhere of your system. recommended to use in your user folder (or in your documents folder if you create code in documents folder to get better performance or in your work folder to much better performance))
+;; you can import a file with memory points using "memimport filename_memory_point". ex: "memimport mdp" and mdp have the value of "myfile.iasm"
