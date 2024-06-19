@@ -8,6 +8,7 @@ mems = {"map": "", "mbp": "", "mcp": "", "mdp": "", "mep": "", "mfp": "", "mgp":
 stack = []
 labels = {}
 memslen = len(mems)
+variables = {}
 
 # made by chatgpt
 def search_iasmimport(current_dir):
@@ -246,6 +247,27 @@ def interpret(code):
                             interpret(fi.read())
                     else:
                         print("Error: Use .iasm file extension")
+                elif token == ".data":
+                    datatype = tokens[1]
+                    name = tokens[2]
+                    if datatype == "int":
+                        value = tokens[3]
+                        variables[name] = int(value)
+                    if datatype == "float":
+                        value = tokens[3]
+                        variables[name] = float(value)
+                    if datatype == "string":
+                        value = " ".join(tokens[3:]).replace("\\n", "\n").replace("\\spc", " ")
+                        variables[name] = value
+                elif token == "joinvar":
+                    memname = tokens[1]
+                    mems[memname] = variables.get(tokens[2]) + stack[len(stack) - 3]
+                elif token == "joinvarspc":
+                    memname = tokens[1]
+                    mems[memname] = variables.get(tokens[2]) + " " + stack[len(stack) - 3]
+                elif token == "joinvarnl":
+                    memname = tokens[1]
+                    mems[memname] = variables.get(tokens[2]) + "\n" + stack[len(stack) - 3]
                 else:
                     print(f"Error: unkown token '{token}'.")
             elif in_label[0]:
@@ -260,7 +282,7 @@ def interpret(code):
                 sys.exit(1)
     
 if __name__ == "__main__":
-    version = "1.1"
+    version = "1.2"
     if len(sys.argv) == 1:
         print(f"Interpreted assembly. version: {version}")
         print(f"Usage: {sys.argv[0]} <file>")
