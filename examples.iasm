@@ -181,5 +181,8 @@ ncmp mcp mdp isnotequal
 
 ;; you can create variables:
 .data int myint 10
-;; types: int, string, float
+;; types: int, string, float, input
 ;; structure: .data datatype varname value
+.data input name What's your name? >\spc
+;; you can add the value of an variable to the stack using: tostack varname
+;; and to a memory point using: tomemory varname memoryname
