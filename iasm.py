@@ -259,6 +259,16 @@ def interpret(code):
                     if datatype == "string":
                         value = " ".join(tokens[3:]).replace("\\n", "\n").replace("\\spc", " ")
                         variables[name] = value
+                    if datatype == "input":
+                        value = " ".join(tokens[3:]).replace("\\n", "\n").replace("\\spc", " ")
+                        variables[name] = input(value)
+                elif token == "tostack":
+                    varname = tokens[1]
+                    stack.append(variables.get(varname))
+                elif token == "tomemory":
+                    varname = tokens[1]
+                    memoryname = tokens[2]
+                    mems[memoryname] = variables.get(varname)
                 elif token == "joinvar":
                     memname = tokens[1]
                     mems[memname] = variables.get(tokens[2]) + stack[len(stack) - 3]
