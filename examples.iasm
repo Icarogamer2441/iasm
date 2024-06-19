@@ -178,3 +178,8 @@ ncmp mcp mdp isnotequal
 ;; you can import a file using "readimport filename.iasm"
 ;; you can import a lib using "import libname.iasm" (you need to have the "iasmimport" folder in somewhere of your system. recommended to use in your user folder (or in your documents folder if you create code in documents folder to get better performance or in your work folder to much better performance))
 ;; you can import a file with memory points using "memimport filename_memory_point". ex: "memimport mdp" and mdp have the value of "myfile.iasm"
+
+;; you can create variables:
+.data int myint 10
+;; types: int, string, float
+;; structure: .data datatype varname value
